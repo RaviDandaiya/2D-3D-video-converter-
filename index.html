@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video to 2D Anime Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+        <header>
+            <h1>Video2Anime</h1>
+            <span class="subtitle">Premium Animation Converter</span>
+        </header>
+
+        <!-- Upload Section -->
+        <section id="upload-section" class="active">
+            <div class="upload-box" id="drop-zone">
+                <div class="upload-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        class="style-icon-svg" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                </div>
+                <h3 style="margin:0;font-size:0.9rem;color:#ccc;">Upload Video</h3>
+                <p style="margin:0.5rem 0;font-size:0.7rem;color:#666;">Drag & drop</p>
+                <input type="file" id="file-input" accept="video/mp4,video/quicktime,video/webm" hidden>
+                <button class="browse-btn" id="browse-btn-click">Choose File</button>
+                <p class="file-info" id="file-name" style="margin-top:0.5rem;font-size:0.7rem;color:#d4af37;"></p>
+            </div>
+
+            <!-- Style Selector -->
+            <div class="style-selector">
+                <h3>CHOOSE STYLE:</h3>
+                <div class="style-options">
+                    <label class="style-option">
+                        <input type="radio" name="style" value="scratch" checked>
+                        <span class="style-card">
+                            <span class="style-icon">✏️</span>
+                            <span class="style-name">Sketch</span>
+                        </span>
+                    </label>
+                    <label class="style-option">
+                        <input type="radio" name="style" value="moe">
+                        <span class="style-card">
+                            <span class="style-icon">🎀</span>
+                            <span class="style-name">Moe Anime</span>
+                        </span>
+                    </label>
+                    <label class="style-option">
+                        <input type="radio" name="style" value="kodomo">
+                        <span class="style-card">
+                            <span class="style-icon">🎈</span>
+                            <span class="style-name">Kodomo</span>
+                        </span>
+                    </label>
+                    <label class="style-option">
+                        <input type="radio" name="style" value="3drender">
+                        <span class="style-card">
+                            <span class="style-icon">🧊</span>
+                            <span class="style-name">3D Render</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <button id="convert-btn" disabled>Upload & Convert</button>
+            <p style="margin-top:1rem;font-size:0.6rem;color:#444;">Max file size: 50MB. Format: MP4.</p>
+        </section>
+
+        <!-- Processing Section -->
+        <section id="processing-section" class="hidden">
+            <div class="status-indicator">
+                <h2 style="font-size:1.2rem;color:#d4af37;margin-bottom:0.5rem;">Processing...</h2>
+                <p style="font-size:0.7rem;color:#888;">Rendering frame-by-frame for highest quality.</p>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <p id="progress-text" style="font-size:0.8rem;color:#ccc;">0%</p>
+
+            <div id="ad-container">
+                <span>Advertisement</span>
+                <p>Your video is being processed...</p>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section id="result-section" class="hidden">
+            <div style="margin-bottom:1.5rem;color:#22c55e;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+            </div>
+            <h2 style="color:#d4af37;font-size:1.5rem;">Ready!</h2>
+            <p style="font-size:0.8rem;color:#888;">Your animation is complete.</p>
+
+            <button id="download-btn" class="primary-btn">Download Video</button>
+            <button id="restart-btn" class="secondary-btn">Convert Another</button>
+        </section>
+
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>
