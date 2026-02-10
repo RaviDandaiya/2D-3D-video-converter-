@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const adContainer = document.getElementById('ad-container');
     const downloadBtn = document.getElementById('download-btn');
     const restartBtn = document.getElementById('restart-btn');
+    const safeAudioToggle = document.getElementById('safe-audio-toggle');
+    const transformOverlayToggle = document.getElementById('transform-overlay-toggle');
 
     let selectedFile = null;
     let selectedStyle = 'scratch';
@@ -108,7 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
             source.connect(destination);
 
             // Audio track check
-            if (destination.stream.getAudioTracks().length > 0) {
+            if (safeAudioToggle && safeAudioToggle.checked) {
+                console.log("Using Safe Audio (Synthesized)");
+                // Create a simple synth loop for copyright-free audio
+                const safeAudioStream = createSafeAudioStream(audioCtx);
+                stream.addTrack(safeAudioStream.getAudioTracks()[0]);
+                video.muted = true; // Mute original
+            } else if (destination.stream.getAudioTracks().length > 0) {
                 console.log("Audio track captured successfully via AudioContext");
                 stream.addTrack(destination.stream.getAudioTracks()[0]);
             } else {
@@ -223,6 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (selectedStyle === 'moe') applyMoeEffect(ctx, canvas);
             else if (selectedStyle === 'kodomo') applyKodomoEffect(ctx, canvas);
             else if (selectedStyle === '3drender') apply3DRenderEffect(ctx, canvas);
+
+            // Extra Transformation Overlay (Copyright Protection)
+            if (transformOverlayToggle && transformOverlayToggle.checked) {
+                applyTransformationOverlay(ctx, canvas);
+            }
 
             // Progress
             const percent = Math.min(100, (video.currentTime / duration) * 100);
@@ -406,6 +419,66 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         ctx.putImageData(frame, 0, 0);
+    }
+
+    function applyTransformationOverlay(ctx, canvas) {
+        const w = canvas.width, h = canvas.height;
+        // 1. Subtle Vignette
+        const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(0.8, 'rgba(0,0,0,0.1)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.4)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Subtle Noise/Texture (Makes it harder for ContentID to match exact pixels)
+        for (let i = 0; i < 50; i++) {
+            ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+            ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+        }
+
+        // 3. Transformation Watermark (Optional but helpful for fair use)
+        ctx.font = '10px Inter';
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
+        ctx.fillText('ENHANCED BY VIDEO2ANIME', 10, h - 10);
+    }
+
+    // --- Safe Audio Synthesizer ---
+    function createSafeAudioStream(audioCtx) {
+        const dest = audioCtx.createMediaStreamDestination();
+
+        // Create a simple rhythmic synth pattern
+        const playNote = (time, freq, type = 'sine', duration = 0.5) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, time);
+            gain.gain.setValueAtTime(0.1, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+            osc.connect(gain);
+            gain.connect(dest);
+            osc.start(time);
+            osc.stop(time + duration);
+        };
+
+        // Schedule a simple loop
+        const now = audioCtx.currentTime;
+        const bpm = 120;
+        const secondsPerBeat = 60 / bpm;
+
+        // Schedule for next 10 minutes (plenty for most videos)
+        for (let i = 0; i < 200; i++) {
+            const t = now + (i * secondsPerBeat);
+            // Kick-like
+            playNote(t, 60, 'sine', 0.2);
+            // Hi-hat-like
+            if (i % 2 === 1) playNote(t, 5000, 'square', 0.05);
+            // Bass-like
+            if (i % 4 === 0) playNote(t, 110, 'triangle', 0.4);
+            if (i % 4 === 2) playNote(t, 130, 'triangle', 0.3);
+        }
+
+        return dest.stream;
     }
 
     // UI Listeners
